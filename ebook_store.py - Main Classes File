@@ -1,0 +1,95 @@
+from datetime import date
+
+class Customer:
+    def __init__(self, name, contact_information, loyalty_member):
+        self.name = name
+        self.contact_information = contact_information
+        self.loyalty_member = loyalty_member
+        self.order_list = []
+    
+    def __str__(self):
+        return f"Customer Name: {self.name}, Email: {self.contact_information}, Loyalty Member: {self.loyalty_member}"
+    
+    def add_order(self, order):
+        self.order_list.append(order)
+
+class ShoppingCart:
+    def __init__(self):
+        self.ebook_list = []
+    
+    def add_to_cart(self, ebook):
+        self.ebook_list.append(ebook)
+    
+    def remove_from_cart(self, ebook):
+        self.ebook_list.remove(ebook)
+    
+    def calculate_total(self):
+        return sum(ebook.price for ebook in self.ebook_list)
+    
+    def __str__(self):
+        return f"Shopping Cart with {len(self.ebook_list)} e-books, Total Quantity: {len(self.ebook_list)}"
+
+class EBook:
+    def __init__(self, title, author, pub_date, genre, price):
+        self.title = title
+        self.author = author
+        self.pub_date = pub_date
+        self.genre = genre
+        self.price = price
+    
+    def __str__(self):
+        return f"Ebook: {self.title} by {self.author}, Genre: {self.genre}, Price: {self.price}"
+    
+    def update_price(self, new_price):
+        self.price = new_price
+
+class PublicationDetails:
+    def __init__(self, publisher, isbn, language):
+        self.publisher = publisher
+        self.isbn = isbn
+        self.language = language
+    
+    def __str__(self):
+        return f"Publisher: {self.publisher}, ISBN: {self.isbn}, Language: {self.language}"
+
+class Order:
+    def __init__(self, order_date, shopping_cart):
+        self.order_date = order_date
+        self.ebooks = shopping_cart.ebook_list
+        self.final_total = shopping_cart.calculate_total()
+    
+    def apply_discounts(self, loyalty_member):
+        discount = 0.1 if loyalty_member else 0
+        self.final_total *= (1 - discount)
+    
+    def calculate_vat(self):
+        vat = 0.08
+        self.final_total *= (1 + vat)
+    
+    def get_final_total(self):
+        return self.final_total
+    
+    def __str__(self):
+        return f"Order Date: {self.order_date}, Total: {self.final_total}"
+
+class Discount:
+    def __init__(self, loyalty_discount=0.1, bulk_discount=0.2):
+        self.loyalty_discount = loyalty_discount
+        self.bulk_discount = bulk_discount
+    
+    def apply_loyalty_discount(self, total):
+        return total * (1 - self.loyalty_discount)
+    
+    def apply_bulk_discount(self, total, count):
+        if count >= 5:
+            return total * (1 - self.bulk_discount)
+        return total
+
+class Invoice(Order):
+    def __init__(self, order_details, customer_details):
+        super().__init__(order_details.order_date, order_details)
+        self.order_details = order_details
+        self.customer_details = customer_details
+    
+    def generate_invoice(self):
+        return f"Invoice for {self.customer_details.name} on {self.order_date}: Total {self.get_final_total()}"
